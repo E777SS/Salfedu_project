@@ -1,4 +1,4 @@
-from django.http import HttpResponse, HttpResponseNotFound
+from django.http import HttpResponse, HttpResponseNotFound, Http404
 from django.shortcuts import render, redirect
 from .models import *
 
@@ -43,7 +43,18 @@ def show_post(request, post_id):
 
 
 def show_category(request, cat_id):
-    return HttpResponse(f'<h1>Отображение категории с id {cat_id}</h1>')
+    posts = Women.objects.filter(cat_id=cat_id)
+    cats = Category.objects.all()
+
+    if len(posts) == 0:
+        raise Http404()
+    context = {'posts': posts,
+               'cats': cats,
+               'menu': menu,
+               'title': 'Отображение по рубрикам',
+               'cat_selected': cat_id,
+               }
+    return render(request, 'women/index.html', context=context)
 
 
 def pageNotFound(request, exception):
